@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news_application/articles.dart';
+import 'article_card.dart';
 // 기본적인 드로잉 처리만 이 파일에서 처리
 void main() {
   runApp(const MyApp());
@@ -55,15 +56,12 @@ class _NewsPageState extends State<NewsPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) { //데이터가 없으면. !은 null check 관련
             return const Center(child: Text('No Data'));
           } else {
-            return ListView.builder(
+            //리스트뷰에 들어가는 기본적인 구성품은 listtile. 
+            return ListView.builder( // 리스트 타일을 계속 만들어줌. 
               itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final article = snapshot.data![index];
-                return ListTile(
-                  title: Text(article.title),
-                  subtitle: Text(article.description),
-                  leading:Image.network(article.urlToImage),
-                );
+              itemBuilder: (context, index) { // 익명 함수
+                final article = snapshot.data![index]; //article은 아까 만든 데이터만 들어있는 클래스. 
+                return ArticleCard(article: article, key : ValueKey(article.title)); // valuekey : article title을 seed로 key 만들어줌
               },
             );
           }

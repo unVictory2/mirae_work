@@ -37,6 +37,15 @@ class _NewsPageState extends State<NewsPage> {
     // 데이터 로딩 처리. 
     super.initState(); // 이미 super에 구현돼있어서 뭘 안 해도 알아서 호출됨.
     futureArticles = NewsService().fetchArticles(); // 데이터 로딩
+    // NewsService news = new NewsService();
+    // news.fetchArticles(); 가 생략돼서 News.Service().fetchArticles();가 된거
+  }
+
+  void _onCategoryTap({String category = ''}) { // articles.dart의 기사 가져오는 함수 fetChArticles에 카테고리 설정해줘서 해당 카테고리 기사 가져오게 한다.
+  //인자 중괄호 치는 건 named parameter로 만드는 것. null값 안 되니까 기본값으로 '' 넣어줌.
+    setState(() {
+      futureArticles = NewsService().fetchArticles(category: category);
+    });
   }
 
   @override
@@ -46,6 +55,78 @@ class _NewsPageState extends State<NewsPage> {
         title : Text('News', style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.surface),), //글자 설정 및 색 변경. TextStyle에서 color 뿐만 아니라 font, font style, font weight, font size 등도 바꿀 수 있다.
         backgroundColor: Theme.of(context).colorScheme.primary, //context 기반으로 아까 위에서 만든 Theme 가져옴. context를 계속 이용해서 디자인 통일성을 유지할 수 있다.
       ),
+      drawer: Drawer( // parameter drawer에 instance Drawer() 생성해서 넣어줌. 좌상단 줄 3개 누르면 카테고리 떠서 카테고리별 뉴스 볼 수 있는 기능.
+        child: ListView( // listview를 주고 children으로 항목 나열
+          padding: EdgeInsets.zero,
+          children : [
+            const DrawerHeader( // drawer한개 listtile 7개
+              decoration: BoxDecoration( // BoxDecoration이라는 위젯을 이용해서 색이나 이미지를 채워 넣을 수 있다.
+                color: Colors.blue,
+                image: DecorationImage(
+                  image: AssetImage('assets/images/news.jpg'),
+                  fit: BoxFit.cover
+                )
+              ),
+              child : Column( // column은 children 속성을 가진다. 즉 안에 속성여러 개 쌓을 수 있다.
+                children: [
+                  Padding(padding: EdgeInsets.only(top:80)), // 위에 공간 둠
+                  Text('News Categories', style: TextStyle(color: Colors.white, fontSize: 24),),
+                ],
+              ),
+            ),
+            ListTile(
+              title : const Text('Headlines'),
+              onTap: () { // 첫 화면이 headlines라 빈 카테고리로 넣으면 됨.
+              _onCategoryTap(category: '');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Business'),
+              onTap: () { // 기능은 여기 구현. initState에서 futureArticles에 들어간 내용이 바뀌었다고 알려야 한다.
+                _onCategoryTap(category: 'Business');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Technology'),
+              onTap: () {
+                _onCategoryTap(category: 'Technology');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Entertainment'),
+              onTap: () {
+                _onCategoryTap(category: 'Entertainment');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Sports'),
+              onTap: () {
+                _onCategoryTap(category: 'Sports');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Science'),
+              onTap: () {
+                _onCategoryTap(category: 'Science');
+                Navigator.pop(context);
+              }
+            ),
+            ListTile(
+              title : const Text('Health'),
+              onTap: () {
+                _onCategoryTap(category: 'Health');
+                Navigator.pop(context);
+              }
+            ),
+          ],
+        )
+      ), 
+
       body: FutureBuilder<List<Article>> (
         future : futureArticles, //위에서 정의한 처리해야 되는 함수
         builder: (context, snapshot) {

@@ -30,7 +30,16 @@ class NewsPage extends StatefulWidget{
   
 //전체 영역을 const로 하는 게 제일 빠르다. 하지만 중간에 바뀌는 부분 있어서 그렇게 만드는 건사실상 불가능. 그래도 안 바뀔 건 const로 넘기는 게 나음. 그래서 코드에 가끔 파란 밑줄 그이는 것 const로 바꾸라고
 class _NewsPageState extends State<NewsPage> {
-  late Future<List<Article>> futureArticles;
+  late Future<List<Article>> futureArticles; // 임시 리스트
+
+  final List<Map<String, String>> categories = [ // 인덱싱을 위해 각 항목은 <Map>으로
+    {'title': 'Headlines'},
+    {'title': 'Business'},
+    {'title': 'Technology'},
+    {'title': 'Entertainment'},
+    {'title': 'Sports'},
+    {'title': 'Science'},
+  ];
 
   @override
   void initState() { // 프로그램 실행되자마자 해야하는 일. 
@@ -74,55 +83,15 @@ class _NewsPageState extends State<NewsPage> {
                 ],
               ),
             ),
-            ListTile(
-              title : const Text('Headlines'),
-              onTap: () { // 첫 화면이 headlines라 빈 카테고리로 넣으면 됨.
-              _onCategoryTap(category: '');
-                Navigator.pop(context);
-              }
-            ),
-            ListTile(
-              title : const Text('Business'),
-              onTap: () { // 기능은 여기 구현. initState에서 futureArticles에 들어간 내용이 바뀌었다고 알려야 한다.
-                _onCategoryTap(category: 'Business');
-                Navigator.pop(context);
-              }
-            ),
-            ListTile(
-              title : const Text('Technology'),
+            //map 함수는 리스트 2개를 가지고 새 리스트 반환하는 함수.
+            // 새로운 리스트를 넣는다. 위에 있는 categories 사용해서 넣을 거임.
+            ...categories.map((category) => ListTile( //기존의 categories는 맵 아이템이 쭉 있을 뿐.
+              title: Text(category['title']!), // 각 항목의 value
               onTap: () {
-                _onCategoryTap(category: 'Technology');
+                _onCategoryTap(category: category['title']!);
                 Navigator.pop(context);
               }
-            ),
-            ListTile(
-              title : const Text('Entertainment'),
-              onTap: () {
-                _onCategoryTap(category: 'Entertainment');
-                Navigator.pop(context);
-              }
-            ),
-            ListTile(
-              title : const Text('Sports'),
-              onTap: () {
-                _onCategoryTap(category: 'Sports');
-                Navigator.pop(context);
-              }
-            ),
-            ListTile(
-              title : const Text('Science'),
-              onTap: () {
-                _onCategoryTap(category: 'Science');
-                Navigator.pop(context);
-              }
-            ),
-            ListTile(
-              title : const Text('Health'),
-              onTap: () {
-                _onCategoryTap(category: 'Health');
-                Navigator.pop(context);
-              }
-            ),
+            )),
           ],
         )
       ), 

@@ -37,7 +37,7 @@ class NewsService { // 데이터를 get 해온다.
 
     return articles; // 기존 : 1페이지에서 2페이지 넘어가면 2페이지를 보여줌. 1페이지 + 2페이지를 보여줘야 하는데, 1은 지우고 2만 보여줌.
   } else {
-    throw Exception("failed to load articles");  
+    return []; 
     }
   }
 

@@ -31,6 +31,11 @@ class NewsPage extends StatefulWidget{
 //전체 영역을 const로 하는 게 제일 빠르다. 하지만 중간에 바뀌는 부분 있어서 그렇게 만드는 건사실상 불가능. 그래도 안 바뀔 건 const로 넘기는 게 나음. 그래서 코드에 가끔 파란 밑줄 그이는 것 const로 바꾸라고
 class _NewsPageState extends State<NewsPage> {
   late Future<List<Article>> futureArticles; // 임시 리스트
+  final List<Article> _articles = []; // 최종적으로 받는 리스트
+  final ScrollController _scrollController = ScrollController();
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+
 
   final List<Map<String, String>> categories = [ // 인덱싱을 위해 각 항목은 <Map>으로
     {'title': 'Headlines'},
@@ -48,12 +53,29 @@ class _NewsPageState extends State<NewsPage> {
     futureArticles = NewsService().fetchArticles(); // 데이터 로딩
     // NewsService news = new NewsService();
     // news.fetchArticles(); 가 생략돼서 News.Service().fetchArticles();가 된거
+    futureArticles.then((articles) { //처음엔 그냥 지나가고, 나중에 futureArticles가 비동기 처리 끝나고 반환돼서 오면 그 때 then 안 쪽의 함수 실행. 인자인 articles는 리스트임. _articles는 맨 위에서 만든 빈 리스트였음.
+    // then 안의 함수는 initState랑은 관련 없는 함수임, setState는 상태 갱신하는 함수.
+      setState(() => _articles.addAll(articles)); 
+    });
+
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _onCategoryTap({String category = ''}) { // articles.dart의 기사 가져오는 함수 fetChArticles에 카테고리 설정해줘서 해당 카테고리 기사 가져오게 한다.
   //인자 중괄호 치는 건 named parameter로 만드는 것. null값 안 되니까 기본값으로 '' 넣어줌.
-    setState(() {
-      futureArticles = NewsService().fetchArticles(category: category);
+    setState(() {  // 카테고리 바꾸면 기존에 쌓여있던 기사들 초기화
+      _articles.clear(); // 쌓인 것들 초기화
+      _currentPage = 1;
+      futureArticles = NewsService().fetchArticles(category: category); //기사 다시 받기
+      futureArticles.then((articles) {
+        setState(() => _articles.addAll(articles));
+      });
     });
   }
 
@@ -107,10 +129,14 @@ class _NewsPageState extends State<NewsPage> {
             return const Center(child: Text('No Data'));
           } else {
             //리스트뷰에 들어가는 기본적인 구성품은 listtile. 
-            return ListView.builder( // 리스트 타일을 계속 만들어줌. 
-              itemCount: snapshot.data!.length,
+            return ListView.builder( // 리스트 타일을 계속 만들어줌.
+              controller: _scrollController, 
+              itemCount: _articles.length + (_isLoadingMore ? 1 : 0), //참이면 1 더함
               itemBuilder: (context, index) { // 익명 함수
-                final article = snapshot.data![index]; //article은 아까 만든 데이터만 들어있는 클래스. 
+                if (index == _articles.length) { // 위에 _isLoadingMore면 1 더해준 이유가 이거 때문임, 로딩 화면 띄우려고
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final article = _articles[index]; // 이걸로 그림 
                 return ArticleCard(article: article, key : ValueKey(article.title)); // valuekey : article title을 seed로 key 만들어줌
               },
             );
@@ -124,6 +150,25 @@ class _NewsPageState extends State<NewsPage> {
 
         ),
     );
+  }
+
+  void _scrollListener() { // 페이지 끝나는 데서 사용자가 스크롤을 더 내린 상황
+    if (_scrollController.position.extentAfter < 200 && !_isLoadingMore) {
+      setState(() {
+        _isLoadingMore = true;
+      });
+      _loadMoreArticles(); // 스크롤 내렸으니까 기사 더 보여줘야 한다
+    }
+  }
+  
+  //이런 인터넷 한 번 갔다오는 애들은 비동기로 해줘야 한다
+  Future<void> _loadMoreArticles() async { 
+    _currentPage++; // 다음 페이지 로딩
+    List<Article> articles = await NewsService().fetchArticles(page: _currentPage);
+    setState(() {
+      _articles.addAll(articles);
+      _isLoadingMore = false;
+    });
   }
 }
   

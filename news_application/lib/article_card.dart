@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'articles.dart';
 //각각의 리스트 타일을 하나의 네모 형태로 만드려고 한다.
 
@@ -11,7 +12,7 @@ ArticleCard({super.key, required this.article}); // article 형식으로 외부�
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => developer.log("URL : ${article.url}"), // Tap 시 로그 출력
+      onTap: () => _launchUrl(article.url),
       child:  Card (
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, //위에다 딱 붙이겠다
@@ -41,5 +42,14 @@ ArticleCard({super.key, required this.article}); // article 형식으로 외부�
       ),
     );
   }
-    
+  
+  _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      //developer.log("URL : ${article.url}");
+      await launchUrl(uri);
+    } else {
+      throw 'could not launch $url';
+    }
+  }
 }

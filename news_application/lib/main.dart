@@ -34,6 +34,8 @@ class _NewsPageState extends State<NewsPage> {
   final List<Article> _articles = []; // 최종적으로 받는 리스트
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
+  String _country = 'kr'; // catrgory나 country 바뀔 때 이걸 바꿔주면 됨
+  String _category = '';
   bool _isLoadingMore = false;
 
 
@@ -67,6 +69,19 @@ class _NewsPageState extends State<NewsPage> {
     super.dispose();
   }
 
+  void _onCountryTap({String country = 'kr'}) {
+    // 밑 함수랑 비슷하게 국가 바꾸는 함수 작성
+    setState(() {  // 카테고리 바꾸면 기존에 쌓여있던 기사들 초기화
+      _articles.clear(); // 쌓인 것들 초기화
+      _currentPage = 1;
+      futureArticles = NewsService().fetchArticles(country: country, category: _category); //기사 다시 받기. country는 바꾸고, category는 현재 카테고리로
+      futureArticles.then((articles) {
+        setState(() => _articles.addAll(articles)); // 비어있는 _articles에 바뀐 카테고리의 기사 넣어줌
+        _country = country; // 이거 왜 있어야 되는지
+      });
+    });
+  }
+
   void _onCategoryTap({String category = ''}) { // articles.dart의 기사 가져오는 함수 fetChArticles에 카테고리 설정해줘서 해당 카테고리 기사 가져오게 한다.
   //인자 중괄호 치는 건 named parameter로 만드는 것. null값 안 되니까 기본값으로 '' 넣어줌.
     setState(() {  // 카테고리 바꾸면 기존에 쌓여있던 기사들 초기화
@@ -74,7 +89,8 @@ class _NewsPageState extends State<NewsPage> {
       _currentPage = 1;
       futureArticles = NewsService().fetchArticles(category: category); //기사 다시 받기
       futureArticles.then((articles) {
-        setState(() => _articles.addAll(articles));
+        setState(() => _articles.addAll(articles)); // 비어있는 _articles에 바뀐 카테고리의 기사 넣어줌
+        _category = category;
       });
     });
   }
@@ -142,11 +158,13 @@ class _NewsPageState extends State<NewsPage> {
             );
           }
         }), // snapshot = 데이터
-        bottomNavigationBar: BottomNavigationBar(items: [ // bottomNaviBar에 들어갈 항목들. 전부 위젯임.
-          const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"), // 미리 정의돼있는 구글 스타일 아이콘. Icons.home은 상수임.
+        bottomNavigationBar: BottomNavigationBar(items: [ // items 항목에 bottomNaviBar에 들어갈 항목들 넣어줌. 전부 위젯임.
+          BottomNavigationBarItem(
+            icon: Image.asset('assets/images/kr.png',width: 24, height: 24), label: "Country"), // 미리 정의돼있는 구글 스타일 아이콘. Icons.home은 상수임.
           const BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
           const BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
         ],
+        onTap: ((value)=>_onNavItemTap(value, context)),
 
         ),
     );
@@ -162,13 +180,117 @@ class _NewsPageState extends State<NewsPage> {
   }
   
   //이런 인터넷 한 번 갔다오는 애들은 비동기로 해줘야 한다
+  // 스크롤을 더 내리면 스크롤 리스너가 동작해서 loadMoreArticles 호출
+  // loadMoreArticles는 기사를 더 불러와서 밑에다가 붙인다
   Future<void> _loadMoreArticles() async { 
     _currentPage++; // 다음 페이지 로딩
-    List<Article> articles = await NewsService().fetchArticles(page: _currentPage);
+    List<Article> articles = await NewsService().fetchArticles(page: _currentPage); // 카테고리는 안 주고 있음, 기존 카테고리 사용
     setState(() {
       _articles.addAll(articles);
       _isLoadingMore = false;
     });
   }
+
+  void _showModalBottomSheet(BuildContext context) {
+    List<Map<String, String>> items = [
+      {'title' : 'Korea', 'images': 'assets/images/kr.png', 'code': 'kr'},
+      {'title' : 'United States', 'images': 'assets/images/japan.webp', 'code': 'us'},
+      {'title' : 'Japan', 'images': 'assets/images/united_states', 'code': 'jp'}
+    ];
+    
+    showModalBottomSheet(context: context, 
+    builder: (BuildContext context) {
+      return Container(
+        height: 200,
+        color: Colors.white,
+        child : GridView.count(
+          crossAxisCount: 3, // 가로 줄의 아이템 몇 개를 대체할 거냐
+          crossAxisSpacing: 4.0, // 가로 아이템 사이의 간격
+          mainAxisSpacing: 4.0, // 상하 방향의 간격
+          children: [
+            //...list.generate()
+            Container(
+              color: Colors.white,
+              child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
+                onTap:() { // 항목 눌렀을 때 처리할 일들
+                  Navigator.pop(context);
+                  _onCountryTap();
+                  //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
+                },
+                child: Center(child:
+                  Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/kr.png', width : 50, height : 50, fit: BoxFit.cover),
+                      Text('Korea')
+                    ],
+                  )
+                ),
+              )
+            ),
+            Container(
+              color: Colors.white,
+              child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
+                onTap:() { // 항목 눌렀을 때 처리할 일들
+                  Navigator.pop(context);
+                  _onCountryTap(country: 'jp'); // country 없이 그냥 ('jp')이라 쓰면 안 됨
+                  //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
+                },
+                child: Center(child:
+                  Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/japan.webp', width : 50, height : 50, fit: BoxFit.cover),
+                      Text('Japan')
+                    ],
+                  )
+                ),
+              )
+            ),   
+            Container(
+              color: Colors.white,
+              child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
+                onTap:() { // 항목 눌렀을 때 처리할 일들
+                  Navigator.pop(context);
+                  _onCountryTap(country: 'us');
+                  //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
+                },
+                child: Center(child:
+                  Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/united_states.png', width : 50, height : 50, fit: BoxFit.cover),
+                      Text('United States')
+                    ],
+                  ),
+                ),
+              ),
+            ),   
+          ],
+        )
+      );
+    });
+  }
+
+  //nav bar에서 action을 하는 게 아니라, 
+  // value : nav bar 아이템 3개 중 눌린 아이템의 인덱스 값
+  //지금은 value와 상관 없이 country 선택이 뜸 > 문제
+  _onNavItemTap(int value, BuildContext context) {
+    print('Selected Index : $value');
+    switch (value) {
+      case 0 : 
+      _showModalBottomSheet(context);
+        break;
+      case 1 :
+        break;
+      case 2 :
+        break;
+    }
+    //show modal = 빈 캔버스 그려줌 
+  }
 }
+  
+
+
+
   

@@ -41,8 +41,12 @@ class NewsService { // 데이터를 get 해온다.
     }
   }
 
-  Future<bool> _isUrlValid(String urlToImage) async { //check whether the url is valid by visiting it. visiting may take some time so you need to do this asynchronously.
+  Future<bool> _isUrlValid(String? urlToImage) async { //check whether the url is valid by visiting it. visiting may take some time so you need to do this asynchronously.
     try {
+      if(urlToImage == null || urlToImage.isEmpty) {
+        return false;
+      }
+      
       final response = await http.head(Uri.parse(urlToImage)); // await 함수는 호출하고 지나가는 게 아니라 결과가 올 때까지 기다림. 그래서 사실 future 쓰는 큰 의미 없다.
       return response.statusCode == 200;
     } catch (e) {

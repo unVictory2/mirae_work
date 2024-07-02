@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_application/articles.dart';
 import 'article_card.dart';
+import 'settings.dart';
 // 기본적인 드로잉 처리만 이 파일에서 처리
 void main() {
   runApp(const MyApp());
@@ -284,6 +285,8 @@ class _NewsPageState extends State<NewsPage> {
       case 1 :
         break;
       case 2 :
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => SettingsPage()));
         break;
     }
     //show modal = 빈 캔버스 그려줌 

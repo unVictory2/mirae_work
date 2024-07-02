@@ -198,7 +198,8 @@ class _NewsPageState extends State<NewsPage> {
       {'title' : 'United States', 'images': 'assets/images/japan.webp', 'code': 'us'},
       {'title' : 'Japan', 'images': 'assets/images/united_states', 'code': 'jp'}
     ];
-    
+    // items.map((item) => print(item['title']));
+
     showModalBottomSheet(context: context, 
     builder: (BuildContext context) {
       return Container(
@@ -209,64 +210,27 @@ class _NewsPageState extends State<NewsPage> {
           crossAxisSpacing: 4.0, // 가로 아이템 사이의 간격
           mainAxisSpacing: 4.0, // 상하 방향의 간격
           children: [
-            //...list.generate()
+            ...items.map((item) => {
             Container(
               color: Colors.white,
               child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
                 onTap:() { // 항목 눌렀을 때 처리할 일들
                   Navigator.pop(context);
-                  _onCountryTap();
+                  _onCountryTap(country : item['code']);
                   //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
                 },
                 child: Center(child:
                   Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/images/kr.png', width : 50, height : 50, fit: BoxFit.cover),
-                      Text('Korea')
+                      Image.asset(item['images'], width : 50, height : 50, fit: BoxFit.cover),
+                      Text(item['title'])
                     ],
                   )
                 ),
               )
             ),
-            Container(
-              color: Colors.white,
-              child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
-                onTap:() { // 항목 눌렀을 때 처리할 일들
-                  Navigator.pop(context);
-                  _onCountryTap(country: 'jp'); // country 없이 그냥 ('jp')이라 쓰면 안 됨
-                  //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
-                },
-                child: Center(child:
-                  Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/images/japan.webp', width : 50, height : 50, fit: BoxFit.cover),
-                      Text('Japan')
-                    ],
-                  )
-                ),
-              )
-            ),   
-            Container(
-              color: Colors.white,
-              child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
-                onTap:() { // 항목 눌렀을 때 처리할 일들
-                  Navigator.pop(context);
-                  _onCountryTap(country: 'us');
-                  //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
-                },
-                child: Center(child:
-                  Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/images/united_states.png', width : 50, height : 50, fit: BoxFit.cover),
-                      Text('United States')
-                    ],
-                  ),
-                ),
-              ),
-            ),   
+            }
           ],
         )
       );

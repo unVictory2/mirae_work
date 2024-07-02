@@ -195,8 +195,8 @@ class _NewsPageState extends State<NewsPage> {
   void _showModalBottomSheet(BuildContext context) {
     List<Map<String, String>> items = [
       {'title' : 'Korea', 'images': 'assets/images/kr.png', 'code': 'kr'},
-      {'title' : 'United States', 'images': 'assets/images/japan.webp', 'code': 'us'},
-      {'title' : 'Japan', 'images': 'assets/images/united_states', 'code': 'jp'}
+      {'title' : 'United States', 'images': 'assets/images/united_states.png', 'code': 'us'},
+      {'title' : 'Japan', 'images': 'assets/images/japan.webp', 'code': 'jp'}
     ];
     // items.map((item) => print(item['title']));
 
@@ -209,29 +209,27 @@ class _NewsPageState extends State<NewsPage> {
           crossAxisCount: 3, // 가로 줄의 아이템 몇 개를 대체할 거냐
           crossAxisSpacing: 4.0, // 가로 아이템 사이의 간격
           mainAxisSpacing: 4.0, // 상하 방향의 간격
-          children: [
-            ...items.map((item) => {
+          children: items.map((item) => // items 리스트를 순회하며 각 항목의 정보를 이용해 항목당 하나의 container를 생성한 후, 나라 3개를 그리고 그걸 리스트로 만들어서 children으로 추가한다. 
             Container(
               color: Colors.white,
               child: GestureDetector( // gridview를 탭했을때 어떤 액션을 하기 위해 child로 바로 getsture detector를 줌
                 onTap:() { // 항목 눌렀을 때 처리할 일들
                   Navigator.pop(context);
-                  _onCountryTap(country : item['code']);
+                  _onCountryTap(country : item['code']!);
                   //country 항목 바뀌게 해보기. 아마 api는 이미 country 받을 수 있게 설계됐을 거임.
                 },
                 child: Center(child:
                   Column( // 각 아이템에 한국 국기, 그 밑 Korea라고 써있게 하기 위해서 column 만듦. 국기+korea가 하나의 column임
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(item['images'], width : 50, height : 50, fit: BoxFit.cover),
-                      Text(item['title'])
+                      Image.asset(item['images']!, width : 50, height : 50, fit: BoxFit.cover),
+                      Text(item['title']!)
                     ],
-                  )
+                  ),
                 ),
-              )
+              ),
             ),
-            }
-          ],
+          ).toList(),
         )
       );
     });

@@ -78,7 +78,7 @@ class _NewsPageState extends State<NewsPage> {
       futureArticles = NewsService().fetchArticles(country: country, category: _category); //기사 다시 받기. country는 바꾸고, category는 현재 카테고리로
       futureArticles.then((articles) {
         setState(() => _articles.addAll(articles)); // 비어있는 _articles에 바뀐 카테고리의 기사 넣어줌
-        _country = country; // 이거 왜 있어야 되는지
+        _country = country; // 같은 국가 설정에서 카테고리 바꿀 일 있으면 사용
       });
     });
   }
@@ -88,10 +88,10 @@ class _NewsPageState extends State<NewsPage> {
     setState(() {  // 카테고리 바꾸면 기존에 쌓여있던 기사들 초기화
       _articles.clear(); // 쌓인 것들 초기화
       _currentPage = 1;
-      futureArticles = NewsService().fetchArticles(category: category); //기사 다시 받기
+      futureArticles = NewsService().fetchArticles(country : _country, category: category); //country : _country 없으면 미국 뉴스에서 비즈니스 누를 경우 한국 비스니스 보여줌
       futureArticles.then((articles) {
         setState(() => _articles.addAll(articles)); // 비어있는 _articles에 바뀐 카테고리의 기사 넣어줌
-        _category = category;
+        _category = category; // 같은 카테고리에서 나라 바꿀 일 있으면 카테고리는 유지되게 해줌
       });
     });
   }

@@ -2,6 +2,12 @@ import FinanceDataReader as fdr
 from flask import Flask, request, jsonify
 # 파이썬에서 가장 유명한 웹 프레임워크 flask, jango. 웹 서비스 애플리케이션 만들게 해줌
 from flask_cors import CORS
+# pip install finance-datareader
+# pip install flask
+# pip install flask_cors
+# pip install beautifulsoup4
+# pip install plotly > Installing collected packages: tenacity, packaging, ploty에서 멈출 경우 좀 기다리다 ctrl c
+
 # 실행 후 크롬에서 http://127.0.0.1:8070/stock?page=1&ppv=20 에 접속.
 
 app = Flask(__name__)

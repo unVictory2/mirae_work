@@ -1,5 +1,5 @@
 # pubspec.yaml 파일은 앱에 관한 기본 정보(예: 현재 버전, 종속 항목, 함께 제공될 애셋)를 지정합니다.
-name: namer_app
+name: flutter_application_1
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

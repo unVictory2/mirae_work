@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // 우상단 debug라고 뜨는 거 없애기
       title : "news app",
       theme : ThemeData (
         primarySwatch: Colors.blue

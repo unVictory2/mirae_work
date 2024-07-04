@@ -1,16 +1,9 @@
 # flutter_application_1
 
-A new Flutter project.
+https://codelabs.developers.google.com/codelabs/flutter-codelab-first?hl=ko#0 
+이 사이트에 나오는 실습을 따라 만들어본 코드.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 동작
+간단히 설명함.  
+2개의 단어를 합친 단어가 뜨고, 다음 걸로 넘기거나 마음에 들면 좋아요 누를 수 있음.  
+좋아요 눌러둔 단어를 따로 모아볼 수도 있음.  

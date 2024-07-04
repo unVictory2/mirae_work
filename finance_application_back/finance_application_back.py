@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 # 실행 후 크롬에서 http://127.0.0.1:8070/stock?page=1&ppv=20 에 접속.
 
+
 app = Flask(__name__)
 CORS(app)
 

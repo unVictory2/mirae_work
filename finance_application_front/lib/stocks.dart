@@ -65,6 +65,7 @@ class Stock {
 
 class StockService {
   Future<List<Stock>> getStocks({int page = 1, int ppv = 20}) async {
+    // 강사님은 stocks라고 쳤는데 난 stock이 맞음, stocks로 치면 못 불러옴
     String url = 'http://223.194.157.229:8070/stock?pages=$page&ppv=$ppv';
 
     final response = await http.get(Uri.parse(url));

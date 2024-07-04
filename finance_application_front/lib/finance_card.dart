@@ -51,7 +51,13 @@ class FinanceCard extends StatelessWidget{
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(stock.chagesRatio.toString()),
+                    // Text(stock.chagesRatio.toString(),),
+                    Text(
+                      stock.chagesRatio.toString(),
+                      style: TextStyle(
+                        color: stock.chagesRatio >= 0 ? Colors.red : Colors.blue,
+                      ),
+                    ),
                   ],
                 ),
               ),

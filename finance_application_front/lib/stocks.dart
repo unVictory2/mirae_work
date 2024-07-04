@@ -20,7 +20,7 @@ class Stock {
   late int stocks;
   late int volume;
 
-  Stock({ // 강사님은 이거 칠 필요 없다고 하셨지만 기본 생성자 없으면 factory를 못 써서 기본 생성자는 필요함. 또 그냥 빈 생성자로 만들어두면 late 관련돼서 문제 생길 수도 있대서 그냥 만들기로 함.
+  Stock({
     required this.code,
     required this.name,
     required this.market,
@@ -40,40 +40,41 @@ class Stock {
     required this.volume,
   });
 
-  factory Stock.fromJson(Map<String, dynamic> json) {
+  factory Stock.fromJson(Map<String, dynamic> x) {
     return Stock(
-      code: json['code'] ?? '',
-      name: json['name'] ?? '',
-      market: json['market'] ?? '',
-      marketId: json['marketID'] ?? '',
-      isuCd: json['isuCd'] ?? '',
-      amount: json['amount'] ?? '',
-      chagesRatio: json['chagesRatio'] ?? '',
-      changeCode: json['changeCode'] ?? '',
-      changes: json['changes'] ?? '',
-      close: json['close'] ?? '',
-      dept: json['dept'] ?? '',
-      high: json['high'] ?? '',
-      low: json['low'] ?? '',
-      marcap: json['marcap'] ?? '',
-      open: json['open'] ?? '',
-      stocks: json['stocks'] ?? '',
-      volume: json['volume'] ?? '',
+      code: x['Code'] ?? '',
+      name: x['Name'] ?? '',
+      market: x['Market'] ?? '',
+      marketId: x['MarketId'] ?? '',
+      isuCd: x['ISU_CD'] ?? '',
+      amount: x['Amount'] ?? 0,
+      chagesRatio: x['ChagesRatio'] ?? 0.0,
+      changeCode: x['ChangeCode'] ?? '',
+      changes: x['Changes'] ?? 0,
+      close: x['Close'] ?? '',
+      dept: x['Dept'] ?? '',
+      high: x['High'] ?? 0,
+      low: x['Low'] ?? 0,
+      marcap: x['Marcap'] ?? 0,
+      open: x['Open'] ?? 0,
+      stocks: x['Stocks'] ?? 0,
+      volume: x['Volume'] ?? 0,
     );
   }
 }
 
 class StockService {
-  Future<List<Stock>> getStocks({int page=1, int ppv=20}) async {
-    String url = 'http://223.194.157.229:8070/stocks?pages=$page&ppv=$ppv';
+  Future<List<Stock>> getStocks({int page = 1, int ppv = 20}) async {
+    String url = 'http://223.194.157.229:8070/stock?pages=$page&ppv=$ppv';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Stock> stocks = body.map((dynamic item) => Stock.fromJson(item)).toList();
+      Map<String, dynamic> body = jsonDecode(response.body);
+      List<dynamic> data = body['data'];
+      List<Stock> stocks = data.map((dynamic item) => Stock.fromJson(item)).toList();
       return stocks;
     } else {
-      throw 'Failed to load stocks';
+      throw Exception('Failed to load stocks');
     }
   }
 }

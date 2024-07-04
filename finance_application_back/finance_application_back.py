@@ -24,7 +24,7 @@ CORS(app)
 # 		stock = fdr.DataReader 등
 
 #FinDataReader한테 stock list 그냥 받아오면 양이 너무 많음. 그래서 페이지로 나누고 한 페이지에서 20개 정도만.
-# base url = http://127.0.0.1/stock?page=1&ppv=20
+# base url = http://127.0.0.1:8070/stock?page=1&ppv=20
 @app.route('/stock', methods=['GET'])
 def get_all_stock():
 	#주소의 page=1에서의1 이 req_page에 들어옴

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/button_horiz_rail.dart';
 import 'my_appbar.dart';
+import 'button_horiz_rail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,16 +52,15 @@ class _MyHomePageState extends State<MyHomePage> {
             constraints: const BoxConstraints(
               minWidth: 300,
             ),
-            child : SingleChildScrollView(
+            child : SingleChildScrollView( 
               scrollDirection: Axis.vertical,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 4,),
-                  Container(
-                    child: Row(),
-                  ),
+                  const ButtonHorizRail(items: [ // 이 부분 좌우스크롤 돼야하는데 안됨, 수정
+                      '쇼핑', '동영상', '게임', '채널', '커뮤니티', '채팅', ],), 
                 ],
               ),
             ),

@@ -2,6 +2,7 @@ import FinanceDataReader as fdr
 from flask import Flask, request, jsonify
 # 파이썬에서 가장 유명한 웹 프레임워크 flask, jango. 웹 서비스 애플리케이션 만들게 해줌
 from flask_cors import CORS
+from datatime import datetime, timedelta
 # pip install finance-datareader
 # pip install flask
 # pip install flask_cors
@@ -22,6 +23,25 @@ CORS(app)
 # 		return jsonify({'error' : 'code is required'}), 400
 # 	try:
 # 		stock = fdr.DataReader 등
+
+@app.route('/stock/<string:stock_code>', methods=['GET'])
+def get_Stock_info(stock_code):
+	try:
+		req_page = request.args.get('page') # ?page=xx => 정수형으로 전환 필요
+		req_days = request.args.get('days') # ?day=xx => 정수형으로 전환 필요. days=30이라고 하드코딩된거 바꾸기 위함. 완성도 놓치는 부분.
+		# 주식 코드 6자리 아니면 에러
+		if len(stock_code) != 6:
+			return jsonify({'error': 'stock_code length should be 6'}), 400
+		
+		# start_date, end_date 구해야 한다
+		end_date = datatime.now() #오늘 기준, 즉 end_date는 오늘이다.
+		start_date = end_date - timedelta(days=30) # 시작 일자는 오늘로부터 30일전
+		df = fdr.DataReader(stock_code, start=start_date, end=end_date)
+		df.index = df.index.strftime('%Y-%m-%d')
+		return jsonify(df.to_dict(orient = 'index')), 200 
+
+	except Exception as e:
+		return jsonify({'error': str(e)}), 500
 
 #FinDataReader한테 stock list 그냥 받아오면 양이 너무 많음. 그래서 페이지로 나누고 한 페이지에서 20개 정도만.
 # base url = http://127.0.0.1:8070/stock?page=1&ppv=20

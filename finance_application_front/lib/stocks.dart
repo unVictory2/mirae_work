@@ -40,6 +40,7 @@ class Stock {
     required this.volume,
   });
 
+  // ohlcv 들어가는 클래스 이거 기반으로 하나 만들기
   factory Stock.fromJson(Map<String, dynamic> x) {
     return Stock(
       code: x['Code'] ?? '',
@@ -79,3 +80,8 @@ class StockService {
     }
   }
 }
+//   Future<List<Stock>> getStockWithCode(String code) async { 
+//     String url = 'http://223.194.157.229:8070/stock?pages=$page&ppv=$ppv';
+
+//   }
+// }

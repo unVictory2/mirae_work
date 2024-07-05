@@ -77,5 +77,31 @@ class FinanceCard extends StatelessWidget{
       ),
     );
   }
-  
+}
+
+// 별도의 widget을 정의해서 그걸로 전일비에 따른 글자색 제어
+class MyText extends StatelessWidget {
+  final String text;
+  final double condition;
+  final double fontSize;
+
+  MyText({required this.text, this.condition=0, this.fontSize = 16});
+
+  @override
+  Widget build (BuildContext context) {
+    Color color = Colors.black;
+    if (condition == 1) {
+      color = Colors.red;
+    } else if (condition == 2) {
+      color = Colors.blue;
+    }
+
+    return Text(
+      text,
+      style : TextStyle(
+        color: color,
+        fontSize: fontSize,
+      )
+    );
+  }
 }

@@ -109,12 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             color: const Color.fromARGB(255, 129, 129, 129),
             width: double.infinity,
-            height: 410,
+            height: 185,
           ),
           Container(
             color: Color.fromARGB(255, 216, 216, 216),
             width: double.infinity,
-            height: 440,
+            height: 210,
           ),
         ]
       ),

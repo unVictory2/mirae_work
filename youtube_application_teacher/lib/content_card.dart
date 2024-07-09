@@ -20,7 +20,7 @@ class ContentCard extends StatelessWidget {
         children: [
           Stack( // 스택 사용 이유 : 영상 뒤에 배경이 있고, 그 위에 이미지나 제목이 얹혀진 형태를 만들기 위해서. 아니면 이미지 위에 텍스트 올라오게 응요도 할 수 있다. 위젯끼리 레이어 해서 쓸 수 있게 해줌.
             children: [
-              Image.asset(image, fit : BoxFit.cover, width: double.infinity,), // 너비는 꽉 채워서
+              Image.network(image, fit : BoxFit.cover, width: double.infinity,), // 너비는 꽉 채워서
               Positioned(
                 bottom: 0,
                 left: 0,

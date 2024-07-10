@@ -16,11 +16,13 @@ class VideoCard extends StatelessWidget {
       height: 320,
       child: Column(
         children: [
-          Stack(
+          Stack( // 스택 사용 이유 : 영상 뒤에 배경이 있고, 그 위에 이미지나 제목이 얹혀진 형태를 만들기 위해서. 아니면 이미지 위에 텍스트 올라오게 응요도 할 수 있다. 위젯끼리 레이어 해서 쓸 수 있게 해줌.
             children: [
-              (board.imageUrls.isEmpty) ? 
+              (board.imageUrls.isEmpty) ? // 삼항 연산자
+              // 이미지가 비어있으면
               Image.asset('assets/images/0.webp', fit: BoxFit.cover, width: double.infinity, height: 240,) : // 이미지가 없을 경우 기본 이미지로 대체
-              Image.network('$baseUrl${board.imageUrls[0]}', fit: BoxFit.cover, width: double.infinity, height: 240,),
+              // 이미지가 비어있지 않으면
+              Image.network('$baseUrl${board.imageUrls[0]}', fit: BoxFit.cover, width: double.infinity, height: 240,), // 너비는 꽉 채워서
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -35,11 +37,11 @@ class VideoCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Row(
+            child: Row( // 개별 영상의 아이콘, 제목, 점3개 부분
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
+                const Column( // 텍스트와 아이콘 배치가 이상해지기 때문에 column 넣어서 정렬. 
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -51,12 +53,14 @@ class VideoCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(width: 16),
-                Expanded(
+                Expanded( // flew 쓰기 위해 Expanded로
                   flex: 12,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: [ 
+                      // maxLines : 문장 길어지면 자연스럽게 2줄로 줄바꿈.
+                      // TextOverflow.ellipsis : 텍스트가 너무 긴 경우 ...으로 생략하면서 잘라줌
                       Text(board.text, style: const TextStyle(fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis,),
                       Text(board.userNickname, 
                         style: const TextStyle(color: Colors.grey, fontSize: 12),),                      
@@ -64,7 +68,7 @@ class VideoCard extends StatelessWidget {
                   )
                 ),
                 const SizedBox(width: 8),
-                Expanded(                            
+                Expanded(                 // 점 3개 아이콘            
                   flex: 1,
                   child: Column(
                     children: [

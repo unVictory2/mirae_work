@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
       ),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, //디버그 띠 삭제
       home: MyHomePage(title: 'Flutter'),
     );
   }
@@ -55,12 +55,16 @@ class _MyHomePageState extends State<MyHomePage>{
 
   Future<List<BoardDTO>> fetchBoards() async {
     final response = await http.get(
-        Uri.parse('http://192.168.123.106:8080/api/board/page?page=0&pageSize=20'),
+        Uri.parse('http://192.168.123.106:8080/api/board/page?page=0&pageSize=20'), 
         //Uri.parse('http://192.0.0.2:8080/api/board/page?page=0&pageSize=20'),
         headers: {'content-type': 'application/json; charset=UTF-8'});
     if (response.statusCode == 200) {
+      // 1. 문자셋을 utf8로 디코딩. 
+      // 2. 들어온 문자열 데이터를 <List<Map<String,dynamic>>> 형식으로 바꿈.
       return (json.decode(utf8.decode(response.bodyBytes))['content'] as List)
+       // 3. 그 아이템들을하나씩 꺼내서 Board 클래스 인스턴스를 만듦, fromJson 생성자 부름
           .map((data) => BoardDTO.fromJson(data))
+          // 4. 그럼 map object가 되는데 이를 리스트로 만들어서 리스트 형식으로 반환한다.
           .toList();
     } else {
       throw Exception('Failed to load boards');
@@ -79,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage>{
           Icon(Icons.search),
         ],
       ),      
-      body: LayoutBuilder(
+      body: LayoutBuilder( // 위젯 반환 함수가 인자로 들어간다. 
         builder: (context, constraints) {
           List<String> items = ['Post', '새로운 맞춤 동영상', '레이아웃', '애니메이션', '쇼핑', '게임', '채널', '커뮤니티'];
           return ConstrainedBox(

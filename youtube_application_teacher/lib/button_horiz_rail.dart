@@ -7,7 +7,7 @@ class ButtonHorizRail extends StatelessWidget {
     this.spacing = 4,
   });
 
-  final List<String> items; // 버튼들에 들어갈 텍스트
+  final List<String> items; // 버튼들 사이의 간격
   final double spacing; // 버튼들 사이의 간격
 
   @override

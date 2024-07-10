@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/button_horiz_rail.dart';
+import 'package:flutter_application_2/content_card.dart';
 import 'board.dart';
 import 'my_appbar.dart';
 import 'button_horiz_rail.dart';
@@ -48,7 +49,6 @@ late Future<List<Board>> futureBoards;
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,8 +80,17 @@ late Future<List<Board>> futureBoards;
                   FutureBuilder(
                     future: futureBoards, 
                     builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error : ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text('No data');
+                      } else {
+                        return Column(
+                          children: snapshot.data!.map((e) =>
+                          ContentCard(board: e, baseUrl: baseUrl,)).toList(),
+                        );
                       }
                     },
                   )
@@ -97,7 +106,7 @@ late Future<List<Board>> futureBoards;
   Future<List<Board>> fetchBoards() async {
     int page = 0; // 페이지 수는 계산해서 해야 함
     int size = 10; // 이걸 하드코딩 하지 말고 설정값으로 해서 바꿀 수 있게 만들어야 함
-    String url = baseUrl + '/api/board/page?page=$page&size=$size';
+    String url = '$baseUrl/api/board/page?page=$page&size=$size';
     final response = await http.get(Uri.parse(url),
     headers: {'Content-Type': 'application/json; charset=UTF-8'},
     );

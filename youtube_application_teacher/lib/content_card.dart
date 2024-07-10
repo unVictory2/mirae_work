@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 
+import 'board.dart';
+
 class ContentCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String image;
+  // final String title;
+  // final String subtitle;
+  // final String image;
+  final Board board;
+  final String baseUrl;
 
   const ContentCard({
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.image,
+    // required this.title,
+    // required this.subtitle,
+    // required this.image,
+    required this.board,
+    required this.baseUrl,
   });
 
   @override
@@ -20,7 +26,12 @@ class ContentCard extends StatelessWidget {
         children: [
           Stack( // 스택 사용 이유 : 영상 뒤에 배경이 있고, 그 위에 이미지나 제목이 얹혀진 형태를 만들기 위해서. 아니면 이미지 위에 텍스트 올라오게 응요도 할 수 있다. 위젯끼리 레이어 해서 쓸 수 있게 해줌.
             children: [
-              Image.network(image, fit : BoxFit.cover, width: double.infinity,), // 너비는 꽉 채워서
+              (board.imageUrls.isEmpty) ? // 삼항 연산자
+              // 이미지가 비어있으면
+              Image.asset('assets/images/no_image.jpg',
+              fit: BoxFit.cover, width: double.infinity,) : 
+              // 이미지가 비어있지 않으면
+              Image.network('$baseUrl${board.imageUrls[0]}', fit : BoxFit.cover, width: double.infinity,), // 너비는 꽉 채워서
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -28,7 +39,7 @@ class ContentCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   color: Colors.black.withOpacity(0.5),
-                  child: Text(title, style: TextStyle(color: Colors.white, fontSize: 12),),
+                  child: Text(board.title, style: TextStyle(color: Colors.white, fontSize: 12),),
                 ),
               )
             ],
@@ -39,13 +50,13 @@ class ContentCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [ 
-                Column( // 텍스트와 아이콘 배치가 이상해지기 때문에 column 넣어서 정렬. 
+                const Column( // 텍스트와 아이콘 배치가 이상해지기 때문에 column 넣어서 정렬. 
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: AssetImage(image),
+                      backgroundImage: AssetImage('assets/images/user.png'),
                     ),
                   ],
                 ),
@@ -58,8 +69,8 @@ class ContentCard extends StatelessWidget {
                     children: [
                       // maxLines : 문장 길어지면 자연스럽게 2줄로 줄바꿈.
                       // TextOverflow.ellipsis : 텍스트가 너무 긴 경우 ...으로 생략하면서 잘라줌
-                      Text(title, style: const TextStyle(fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
-                      Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey),),
+                      Text(board.text, style: const TextStyle(fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(board.userNickname, style: const TextStyle(fontSize: 12, color: Colors.grey),),
                     ],
                   ),
                 ),

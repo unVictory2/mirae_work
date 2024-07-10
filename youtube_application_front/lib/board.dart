@@ -1,4 +1,4 @@
-class Board {
+class BoardDTO {
   final int id;
   final String title;
   final String text;
@@ -9,7 +9,7 @@ class Board {
   final String userNickname;
   final List<String> imageUrls;
 
-  const Board({
+  BoardDTO({
     required this.id,
     required this.title,
     required this.text,
@@ -21,17 +21,17 @@ class Board {
     required this.imageUrls,
   });
 
-  // 데이터를 받아옴
-  factory Board.fromJson(Map<String, dynamic> json) {
-    return Board(
+  factory BoardDTO.fromJson(Map<String, dynamic> json) {
+    return BoardDTO(
       id: json['id'],
       title: json['title'],
       text: json['text'],
-      like: json['text'],
-      unlike: json['text'],
+      like: json['like'],
+      unlike: json['unlike'],
       userId: json['userId'],
       userEmail: json['userEmail'],
-      userNickname: json['userNickname'],
-      imageUrls: List<String>.from(json['imageUrls']));
+      userNickname: json['userNickName'],
+      imageUrls: List<String>.from(json['imageUrls']),
+    );
   }
 }

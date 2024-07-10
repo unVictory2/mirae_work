@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: alstarboard
+  output:
+    ansi:
+      enabled: always
+  servlet:
+    encoding:
+      charset: UTF-8    # 한글 깨짐 방지
+      enabled: true
+      force: true
+      force-request: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/alstarboard?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
+    # HikariCP 설정, 데이터베이스 커넥션 캐싱
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: springHikariCP
+
+  messages:
+    encoding: UTF-8
+
+  jpa:
+    open-in-view: false
+    show-sql: true    # 콘솔에 SQL 출력
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+image:
+  upload:
+    dir: /static/images #src/main/resources/static/images
+  access:
+    url: /images/
+#mybatis:
+#  mapper-locations: classpath:mapper/*.xml
+#  mapper-config-location: classpath:mybatis-config.xml
+#  type-aliases-package: com.example.alstarboard.domain
+#  type-aliases-type:
+#    User: com.example.alstarboard.entity.User
+#    Board: com.example.alstarboard.entity.Board
+#    Image: com.example.alstarboard.entity.Image
+#    Reply: com.example.alstarboard.entity.Reply
+#    UserMapper: com.example.alstarboard.repository.UserMapper
+#    BoardMapper: com.example.alstarboard.repository.BoardMapper
+#    ImageMapper: com.example.alstarboard.repository.ImageMapper
+#    ReplyMapper: com.example.alstarboard.repository.ReplyMapper
+#  configuration:
+#    map-underscore-to-camel-case: true
+
+
+
+
+
+
+
+server:
+  port:8080
+
+logging:
+  level:
+    root: INFO
+    com.example.alstarboard: DEBUG
+  file: logs/alstarboard.log
+  pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+
+

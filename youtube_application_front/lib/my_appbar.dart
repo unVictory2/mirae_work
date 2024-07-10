@@ -18,9 +18,9 @@ class MyAppBar extends AppBar {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              leading, // 홈 아이콘
+              leading, // 홈아이콘, withValue()생성자에서 입력으로 받음
               // Icon(Icons.home, color: Colors.white),
-              const SizedBox(width: 10),
+              const SizedBox(width: 10), // 홈아이콘과 타이틀 사이 간격
               Text(title, // 타이틀. leading과 title 둘 다 withValue 생성자에서 입력 받음.
                 style: const TextStyle(
                   color: Colors.white,

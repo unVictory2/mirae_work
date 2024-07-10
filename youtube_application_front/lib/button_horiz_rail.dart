@@ -28,7 +28,7 @@ class ButtonHorizRail extends StatelessWidget {
                 onPressed: (){ (index, context) => _onPressed(index, context); },                
                 style: const ButtonStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderRadius: BorderRadius.all(Radius.circular(10)), // 버튼의 모서리를 둥글게 만듦
                       ),
                     ),
                     backgroundColor: WidgetStatePropertyAll<Color>(Color.fromARGB(255, 30, 30, 30)),                          

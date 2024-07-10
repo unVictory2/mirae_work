@@ -24,12 +24,13 @@ class _BoardInputPageState extends State<BoardInputPage> {
 
   // XFile은 iOS, Android, 웹, 데스크탑 등 다양한 플랫폼에서 일관된 방식으로 파일을 다룰 수 있게 한다.
   // XFile을 통해 파일을 읽고 쓸 수 있으며, 파일의 메타데이터에 접근할 수 있다.  
-  List<XFile?> _images = List<XFile?>.filled(3, null);
+  List<XFile?> _images = List<XFile?>.filled(3, null); // 3칸짜리 리스트 만들어서 null로 채운다.
 
   // 이미지를 선택하거나 촬영하기 위해 ImagePicker 인스턴스를 생성
   final ImagePicker _picker = ImagePicker();
 
   // uploadUrl은 서버의 업로드 API 주소로 변경해야 함
+    // BoardController 안에 가보면 주소가 /api/board/create다.
   final String uploadUrl = 'http://192.168.123.106:8080/api/board/create';
   // final String uploadUrl = 'http://192.0.0.2:8080/api/board/create';
 
@@ -99,6 +100,7 @@ class _BoardInputPageState extends State<BoardInputPage> {
       request.fields['text'] = _textController.text;
       request.fields['userId'] = '1';  // Replace with actual userId
 
+      // images로 받아온 이미지들을 파일 상태로 추가해서 리스트로 만든다.
       for (var image in _images) {
         if (image != null) {
           request.files.add(await http.MultipartFile.fromPath('files', image.path));

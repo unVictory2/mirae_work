@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_selector/file_selector.dart';
@@ -7,7 +8,9 @@ import 'dart:io';
 
 class BoardInputPage extends StatefulWidget {
   final String userId;
-  const BoardInputPage({super.key, required this.userId});
+  final String baseUrl; // 223.194.157.229
+  // 생성자에서 baseUrl, userId 설정.
+  const BoardInputPage({super.key, required this.userId, required this.baseUrl});
 
   @override
   _BoardInputPageState createState() => _BoardInputPageState();
@@ -24,23 +27,59 @@ class _BoardInputPageState extends State<BoardInputPage> {
 
   // XFile은 iOS, Android, 웹, 데스크탑 등 다양한 플랫폼에서 일관된 방식으로 파일을 다룰 수 있게 한다.
   // XFile을 통해 파일을 읽고 쓸 수 있으며, 파일의 메타데이터에 접근할 수 있다.  
-  List<XFile?> _images = List<XFile?>.filled(3, null); // 3칸짜리 리스트 만들어서 null로 채운다.
+  List<XFile?> _images = List<XFile?>.filled(3, null);
+
+  // 웹에서 이미지 선택할 때 사용할 Uint8List(바이트 스트림) 리스트 
+  List<Uint8List?> _webImages = List<Uint8List?>.filled(3, null);
 
   // 이미지를 선택하거나 촬영하기 위해 ImagePicker 인스턴스를 생성
   final ImagePicker _picker = ImagePicker();
 
   // uploadUrl은 서버의 업로드 API 주소로 변경해야 함
-    // BoardController 안에 가보면 주소가 /api/board/create다.
-  final String uploadUrl = 'http://223.194.157.229:8080/api/board/create';
-  // final String uploadUrl = 'http://192.0.0.2:8080/api/board/create';
-
+  final String uploadUrl = '/api/board/create';
+  
   // 이미지 선택 기능(모바일 or not)
   Future<void> _pickImage(int index) async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      await _pickImageMobile(index);
-    } else {
-      await _pickImageDesktop(index);
+    try{
+      if (index < 0 || index >= _images.length) {
+        print('Index out of range, index: $index');
+        return;
+
+      }
+
+      if (kIsWeb) { // 웹사이트로 접근중인지 판단
+        await _pickImageWeb(index);
+        return;
+      }
+
+      // 크롬기반에서 아래코드를 호출하면 Exception이 발생함!!! 
+      if (Platform.isAndroid || Platform.isIOS) {
+        await _pickImageMobile(index);
+      } else {
+        await _pickImageDesktop(index);
+      }
+    } catch (e) {      
+      print(e);
     }
+    // if (Platform.isAndroid || Platform.isIOS) {
+    //   await _pickImageMobile(index);
+    // } else {
+    //   await _pickImageDesktop(index);
+    // }
+  }
+
+  Future<void> _pickImageWeb(index) async {
+    // XTypeGroup : file_selector 패키지에서 파일 선택을 위한 허용되는 파일 형식(이미지 파일)을 정의
+    // openFile 메서드를 사용하여 파일을 선택하고, 선택한 파일을 XFile 객체로 반환
+    final typeGroup = XTypeGroup(label: 'images', extensions: ['jpg', 'png', 'gif', 'webp']);
+    final file = await openFile(acceptedTypeGroups: [typeGroup]);
+    if (file != null) {
+      final bytes = await file.readAsBytes(); // 바이트 읽어옴
+      setState(() {
+        print('${bytes.length} bytes read.');
+        _webImages[index] = bytes;
+      });
+    }    
   }
 
   // 이미지 선택 기능(모바일) 
@@ -72,6 +111,15 @@ class _BoardInputPageState extends State<BoardInputPage> {
   // 이미지 촬영 기능, iOS와 Android에서만 지원
   // ImagePicker를 사용하여 이미지를 촬영하고, 촬영한 이미지를 _images 리스트에 추가
   Future<void> _takePhoto(int index) async {
+    if (kIsWeb) { // 웹 환경인지 체크
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('카메라는 이 플랫폼에서 지원되지 않습니다.'),
+        ),
+      );
+      return;
+    }
+
     if (Platform.isIOS || Platform.isAndroid) {
       // Use image_picker for iOS and Android
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
@@ -80,7 +128,7 @@ class _BoardInputPageState extends State<BoardInputPage> {
           _images[index] = pickedFile;
         });
       }
-    } else {
+    } else { // 데스크탑인 경우
       // Camera not supported on web, macOS, Windows, and Linux
       // throw UnimplementedError('Camera not supported on this platform');
       // Camera not supported on web, macOS, Windows, and Linux
@@ -95,27 +143,36 @@ class _BoardInputPageState extends State<BoardInputPage> {
 
   Future<void> _uploadData() async {
     if (_formKey.currentState!.validate()) {
-      var request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+
+      String url = '${widget.baseUrl}$uploadUrl';
+      var request = http.MultipartRequest('POST', Uri.parse(url));
       request.fields['title'] = _titleController.text;
       request.fields['text'] = _textController.text;
-      request.fields['userId'] = '1';  // Replace with actual userId
+      request.fields['userId'] = '1';  // 추후에 생성자로부터 받는 userId로 변경
 
-      // images로 받아온 이미지들을 파일 상태로 추가해서 리스트로 만든다.
-      for (var image in _images) {
-        if (image != null) {
-          request.files.add(await http.MultipartFile.fromPath('files', image.path));
+      if (kIsWeb) {
+        // 웹에서 이미지를 업로드할 때는 바이트 스트림으로 반환하여 전송
+        // 웹일 땐 fromBytes로 바이트 스트림 이용하여 파일을 만든다. 이 때 파일명 없으니까 임시로 만든다. (image_$i)
+        int i = 0;
+        for (var image in _webImages) {
+          if (image != null) {
+            request.files.add(http.MultipartFile.fromBytes('files', image, filename: 'image_$i.jpg'));
+          }
+          i++;
+        }
+      } else { // 웹 아닐 때도 비슷하다
+        for (var image in _images) {
+          if (image != null) {
+            request.files.add(await http.MultipartFile.fromPath('files', image.path));
+          }
         }
       }
 
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('게시글이 성공적으로 업로드되었습니다.')),
-        );
-
-        await Future.delayed(const Duration(seconds: 1));
-        Navigator.of(context).pop(true);  // 게시글 작성 페이지를 닫고 이전 페이지로 이동
+        // await Future.delayed(const Duration(seconds: 1));
+        Navigator.of(context).pop(true);  // 게시글 작성 페이지를 닫고 이전 페이지로 이동(pop true)
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('업로드 실패: ${response.statusCode}')),
@@ -190,7 +247,7 @@ class _BoardInputPageState extends State<BoardInputPage> {
                   Wrap( // 한줄에 자식 위젯들이 모드 들어가지 않을 때 자동으로 다음 줄로 넘기는 위젯
                     spacing: 8.0,   // 가로 간격
                     runSpacing: 4.0,  // 세로 간격
-                    children: List.generate(3, (index) {
+                    children: List.generate(3, (index) { // 업로드할 이미지 미리 보여주는 부분
                       return GestureDetector(
                         onTap: () => _pickImage(index),
                         child: Container(
@@ -200,29 +257,58 @@ class _BoardInputPageState extends State<BoardInputPage> {
                             border: Border.all(color: Colors.grey),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: _images[index] != null
-                              ? Stack(
-                                  children: [
-                                    Image.file(
-                                      File(_images[index]!.path),
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
+                          child: (kIsWeb)? // 웹인지 한 번 더 따짐
+                            (_webImages[index] != null) ? // 웹일 때, 이미지 데이터 로딩이 되어 있는지 여부 확인
+                            Stack(
+                              children: [
+                                Image.memory( // 바이트 스트림으로 이미지를 로딩
+                                  _webImages[index]!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _webImages[index] = null;
+                                      });
+                                    },
+                                    child: const Icon(
+                                      Icons.remove_circle,
+                                      color: Colors.red,
                                     ),
-                                    Positioned(
-                                      right: 0,
-                                      child: InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _images[index] = null;
-                                          });
-                                        },
-                                        child: const Icon(
-                                          Icons.remove_circle,
-                                          color: Colors.red,
-                                        ),
+                                  ),
+                                ),
+                              ],
+                            ) :
+                            // 웹 기반일 때 이미지가 로딩돼있지 않다면
+                            const Center(child: Icon(Icons.add_to_photos_sharp),) :
+                            // 웹 기반이 아니라면 기존의 처리를 함
+                            _images[index] != null
+                            ? Stack(
+                                children: [
+                                  Image.file(
+                                    File(_images[index]!.path),
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _images[index] = null;
+                                        });
+                                      },
+                                      child: const Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red,
                                       ),
                                     ),
+                                  ),
                                   ],
                                 )
                               : const Center(

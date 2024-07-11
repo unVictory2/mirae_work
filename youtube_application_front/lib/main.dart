@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   Future<List<BoardDTO>> fetchBoards() async {
     final response = await http.get(
-        Uri.parse('http://192.168.123.106:8080/api/board/page?page=0&pageSize=20'), 
+        Uri.parse('http://223.194.157.229:8080/api/board/page?page=0&pageSize=20'), 
         //Uri.parse('http://192.0.0.2:8080/api/board/page?page=0&pageSize=20'),
         headers: {'content-type': 'application/json; charset=UTF-8'});
     if (response.statusCode == 200) {
